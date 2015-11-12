@@ -25,6 +25,7 @@ for element in root.findall('fixed_annotation/transcript/coordinates'):
     print "Co-ordinate system:", element.attrib['coord_system']			#nood this for loop since more than one transcript
 
 sequence=root.find('fixed_annotation/sequence').text
+sequence=sequence.upper()
 lrg_num=root.find('fixed_annotation/id').text
 
 exons=[]
@@ -42,3 +43,20 @@ for i in sequence:
 	a=['A', 'T', 'C', 'G']
 	assert i in a , "not atcg"
 
+introns=[]
+for i in range(len(exons)+1):
+	if i==0:
+		introns.append({'intron_number':i, 'start':0, 'end':5000})
+	elif i<len(exons):
+		introns.append({'intron_number':i, 'start':(int(exons[i-1]['end'])+1), 'end':(int(exons[i]['start'])-1)})
+	else:
+		introns.append({'intron_number':i, 'start':(int(exons[i-1]['end'])+1), 'end':len(sequence)})
+
+for i in introns:
+	print i
+
+intron_sequences=[]
+for i in range(len(introns)):
+	intron_sequences.append(sequence[introns[i]['start']:introns[i]['end']])
+
+print (intron_sequences[0])
