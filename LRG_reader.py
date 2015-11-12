@@ -6,6 +6,7 @@ print " "
 print "Schema Details"
 print" "
 print "Schema Version:", root.attrib['schema_version']
+assert root.attrib['schema_version'] == '1.9' , 'wrong schema version'
 print "Schema ID:", root.find('fixed_annotation/id').text
 print "Schema HGNC ID:", root.find('fixed_annotation/hgnc_id').text
 print "Organism:", root.find('fixed_annotation/organism').text
@@ -29,6 +30,15 @@ lrg_num=root.find('fixed_annotation/id').text
 exons=[]
 for elem in root.findall('fixed_annotation/transcript/exon'):
 	for cords in elem.findall('coordinates'):
+		if cords.attrib['coord_system']==lrg_num:
 			a = cords.attrib
 	a['exon']=elem.attrib['label']     #adding exon number to dictionary
 	exons.append(a)
+
+total_length=root.find('fixed_annotation/transcript/coordinates').attrib['end']
+assert len(sequence)==(int(total_length)+2000) , 'Length of sequence wrong'
+
+for i in sequence:
+	a=['A', 'T', 'C', 'G']
+	assert i in a , "not atcg"
+
