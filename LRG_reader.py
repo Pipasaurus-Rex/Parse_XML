@@ -40,8 +40,6 @@ def exons(transcript, exon_num):		#this function returns the exon information fo
 	assert exon_list[exon_num-1]['exon']==str(exon_num) , 'exon number in label does not match exon number requested'
 	return exon_list[exon_num-1]
 
-for i in range(len(exons)):
-	assert exons[i]['exon']==str(i+1), 'exons not coming in logical order'
 
 total_length=root.find('fixed_annotation/transcript/coordinates').attrib['end']
 assert len(sequence)==(int(total_length)+2000) , 'Length of sequence wrong'
@@ -50,19 +48,17 @@ for i in sequence:
 	a=['A', 'T', 'C', 'G']
 	assert i in a , "not atcg"
 
-introns=[]
-for i in range(len(exons)+1):
-	if i==0:
-		introns.append({'intron_number':i, 'start':0, 'end':5000})
-	elif i<len(exons):
-		introns.append({'intron_number':i, 'start':(int(exons[i-1]['end'])+1), 'end':(int(exons[i]['start'])-1)})
-	else:
-		introns.append({'intron_number':i, 'start':(int(exons[i-1]['end'])+1), 'end':len(sequence)})
+def introns(transcript, intron_num):
+	a='fixed_annotation/transcript[@name="'+transcript+'"]/exon'
+	if intron_num ==0:
+		return {'intron': 0, 'start':0, 'end': 5000}
+	elif intron_num < len(root.findall(a)):
+		return {'intron': intron_num, 'start':int(exons(transcript, intron_num)['end'])+1, 'end':int(exons(transcript, intron_num+1)['start'])-1}
+	elif intron_num == len(root.findall(a)):
+		return {'intron':intron_num, 'start':int(exons(transcript, intron_num)['end'])+1, 'end':int(exons(transcript, intron_num)['end'])+2000}
 
+def intron_sequence(transcript, intron_num ):
+	assert len(sequence[introns(transcript, intron_num)['start']:introns(transcript, intron_num)['end']])==introns(transcript, intron_num)['end']-introns(transcript, intron_num)['start'] , 'intron length wrong'
+	return sequence[introns(transcript, intron_num)['start']:introns(transcript, intron_num)['end']]
 
-
-def intron_sequence(n):
-	assert len(sequence[introns[n]['start']:introns[n]['end']])==introns[n]['end']-introns[n]['start'] , 'intron length wrong'
-	return sequence[introns[n]['start']:introns[n]['end']]
-
-print (intron_sequence(0))
+print (intron_sequence('t1', 0))
