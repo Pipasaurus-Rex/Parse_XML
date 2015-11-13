@@ -1,5 +1,7 @@
 import xml.etree.ElementTree as tree
-LRG_file_tree = tree.parse('LRG_517.xml')
+import re
+file_name=raw_input('Please enter file name:')
+LRG_file_tree = tree.parse(file_name)
 root=LRG_file_tree.getroot()
 
 # variables
@@ -27,9 +29,12 @@ def exons(transcript, exon_num):		#this function returns the exon information fo
 		for cords in elem.findall('coordinates'):
 			if cords.attrib['coord_system']==root_id:		#ensures right transcript sequence selected, not protein or coding
 				b = cords.attrib
-		b['exon']=elem.attrib['label']
+		if elem.attrib['label'].isdigit():
+			b['exon']=elem.attrib['label']
+		else:
+			b['exon']=re.sub("\D", "",elem.attrib['label'])
 		exon_list.append(b)	
-	assert exon_list[exon_num-1]['exon']==str(exon_num) , 'exon number in label does not match exon number requested'
+	assert exon_list[exon_num-1]['exon']==str(exon_num) , 'exon number in label does not match exon number requested'+ transcript + ' ' + str(exon_num)
 	return exon_list[exon_num-1]
 
 
@@ -76,7 +81,16 @@ if root_source_name != None:
 	tree.SubElement(contact_details, "name").text = root_source_email
 	
  
+transcripts=[]
+for i in root.findall('fixed_annotation/transcript'):
+	x=i.attrib['name']
+	transcripts.append(x)
 
+for i in transcripts:
+	intron_details = tree.SubElement(output, "intron_details", transcript=i)
+	for j in range(len(root.findall('fixed_annotation/transcript[@name="'+i+'"]/exon'))):
+		intron = tree.SubElement(intron_details, "intron", number=str(j), start=str(introns(i,j)['start']), end=str(introns(i,j)['end'])).text=intron_sequence(i,j)
+		
 # export xml
 tree = tree.ElementTree(output)
 #tree.write("alex_test_file2.xml")
