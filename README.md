@@ -14,7 +14,7 @@ python LRG_parser.py
 Users must enter the XML file they intend to parse including the .xml extension
 Users can specify the relative/absolute path to the input file.
 ```bash
-Please enter file name:
+Please enter file name: LRG_5.xml
 ```
 
 ## Output
@@ -23,5 +23,7 @@ The output of the script is an XML file containing:
 - Schema details
 - Source/contact details
 - Intron details
-
-
+-- Intron number
+-- Start position
+-- End position
+-- Intron sequence
