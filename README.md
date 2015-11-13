@@ -23,7 +23,7 @@ The output of the script is an XML file containing:
 - Schema details
 - Source/contact details
 - Intron details
--- Intron number
--- Start position
--- End position
--- Intron sequence
+	- Intron number
+	- Start position
+	- End position
+	- Intron sequence
